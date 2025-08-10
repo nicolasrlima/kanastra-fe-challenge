@@ -120,7 +120,16 @@ export function ArtistsTable() {
           </TableHeader>
           <TableBody>
             {artists.map((artist: Artist) => (
-              <TableRow key={artist.id}>
+              <TableRow
+                key={artist.id}
+                className="cursor-pointer hover:bg-accent"
+                onClick={() =>
+                  navigate({
+                    to: "/artist",
+                    search: { artistId: artist.id, albumPage: 1 },
+                  })
+                }
+              >
                 <TableCell>
                   {artist.images[0] && (
                     <img
