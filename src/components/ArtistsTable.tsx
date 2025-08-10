@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { spotifyApiRequest } from "@/lib/spotify";
+import { useSearch, useNavigate } from "@tanstack/react-router";
 import {
   Table,
   TableHeader,
@@ -17,7 +18,7 @@ import {
   PaginationPrevious,
   PaginationNext,
 } from "@/components/ui/pagination";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface Artist {
   id: string;
@@ -39,42 +40,40 @@ interface SpotifyArtistsResponse {
 const PAGE_SIZE = 20;
 
 export function ArtistsTable() {
-  const [page, setPage] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    return Number(params.get("page")) || 1;
-  });
-  const [query, setQuery] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    return params.get("q") || "";
-  });
+  const search = useSearch({ from: "/" });
+  const navigate = useNavigate({ from: "/" });
+  const page = search.page;
+  const query = search.q;
   const [searchInput, setSearchInput] = useState(query);
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (query) {
-      params.set("q", query);
-    } else {
-      params.delete("q");
-    }
-    if (page > 1) {
-      params.set("page", String(page));
-    } else {
-      params.delete("page");
-    }
-    const newUrl = `${window.location.pathname}${params.toString() ? "?" + params.toString() : ""}`;
-    window.history.replaceState({}, "", newUrl);
-  }, [query, page]);
+  const setSearchParams = useCallback(
+    (params: Partial<typeof search>) => {
+      const newParams = { ...search, ...params };
+      Object.keys(newParams).forEach((k) => {
+        const key = k as keyof typeof newParams;
+        if (newParams[key] === undefined || newParams[key] === "") {
+          delete newParams[key];
+        }
+      });
+      navigate({ search: newParams });
+    },
+    [navigate, search]
+  );
 
-  // Debounce search input
   useEffect(() => {
-    const handler = setTimeout(() => {
-      setPage(1);
-      setQuery(searchInput.trim());
-    }, 400);
-    return () => clearTimeout(handler);
-  }, [searchInput]);
+    if (searchInput !== query) {
+      const handler = setTimeout(() => {
+        setSearchParams({ q: searchInput, page: 1 });
+      }, 400);
+      return () => clearTimeout(handler);
+    }
+  }, [searchInput, query, setSearchParams]);
 
-  const shouldFetch = query.length > 0;
+  const handlePageChange = (newPage: number) => {
+    setSearchParams({ page: newPage });
+  };
+
+  const shouldFetch = query?.length > 0;
   const { data, isLoading, error } = useQuery<SpotifyArtistsResponse, Error>({
     queryKey: ["artists", page, query],
     queryFn: async () =>
@@ -142,7 +141,7 @@ export function ArtistsTable() {
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                onClick={() => handlePageChange(Math.max(1, page - 1))}
                 aria-disabled={page === 1}
                 tabIndex={page === 1 ? -1 : 0}
               />
@@ -151,7 +150,7 @@ export function ArtistsTable() {
               <PaginationItem key={i + 1}>
                 <PaginationLink
                   isActive={page === i + 1}
-                  onClick={() => setPage(i + 1)}
+                  onClick={() => handlePageChange(i + 1)}
                   href="#"
                 >
                   {i + 1}
@@ -160,7 +159,7 @@ export function ArtistsTable() {
             ))}
             <PaginationItem>
               <PaginationNext
-                onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+                onClick={() => handlePageChange(Math.min(pageCount, page + 1))}
                 aria-disabled={page === pageCount}
                 tabIndex={page === pageCount ? -1 : 0}
               />
