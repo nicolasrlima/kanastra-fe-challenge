@@ -106,7 +106,14 @@ export function ArtistPage() {
   if (!artistId)
     return <div className="p-8 text-center">No artist selected.</div>;
   if (loadingArtist)
-    return <div className="p-8 text-center">Loading artist...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center p-12 min-h-[300px]">
+        <div className="w-16 h-16 border-4 border-accent border-t-transparent rounded-full animate-spin mb-4" />
+        <div className="text-lg text-muted-foreground font-medium">
+          Loading artist...
+        </div>
+      </div>
+    );
   if (!artist) return <div className="p-8 text-center">Artist not found.</div>;
 
   return (
@@ -131,7 +138,10 @@ export function ArtistPage() {
       </div>
       <h2 className="text-xl font-semibold mt-8 mb-2">Top Tracks</h2>
       {loadingTracks ? (
-        <div>Loading top tracks...</div>
+        <div className="flex flex-col items-center justify-center py-8">
+          <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin mb-2" />
+          <div className="text-muted-foreground">Loading top tracks...</div>
+        </div>
       ) : (
         <ol className="list-decimal ml-6">
           {topTracks?.tracks?.slice(0, 10).map((track) => (
@@ -158,7 +168,10 @@ export function ArtistPage() {
         />
       </form>
       {loadingAlbums ? (
-        <div>Loading albums...</div>
+        <div className="flex flex-col items-center justify-center py-8">
+          <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin mb-2" />
+          <div className="text-muted-foreground">Loading albums...</div>
+        </div>
       ) : (
         <div>
           <ul className="mb-4">

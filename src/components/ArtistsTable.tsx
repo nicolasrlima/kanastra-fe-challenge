@@ -93,7 +93,12 @@ export function ArtistsTable() {
       </div>
     );
   } else if (isLoading) {
-    content = <div>Loading artists...</div>;
+    content = (
+      <div className="flex flex-col items-center justify-center py-16 min-h-[200px]">
+        <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin mb-4" />
+        <div className="text-lg text-muted-foreground font-medium">Loading artists...</div>
+      </div>
+    );
   } else if (error) {
     content = <div>Error loading artists.</div>;
   } else if ((data?.artists?.items?.length ?? 0) === 0) {
