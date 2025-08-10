@@ -6,6 +6,8 @@ export const Route = createFileRoute("/artist")({
     return {
       artistId: typeof search.artistId === "string" ? search.artistId : "",
       albumPage: search.albumPage ? Number(search.albumPage) : 1,
+      albumQuery:
+        typeof search.albumQuery === "string" ? search.albumQuery : "",
     };
   },
   component: ArtistPage,

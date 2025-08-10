@@ -126,7 +126,11 @@ export function ArtistsTable() {
                 onClick={() =>
                   navigate({
                     to: "/artist",
-                    search: { artistId: artist.id, albumPage: 1 },
+                    search: {
+                      artistId: artist.id,
+                      albumPage: 1,
+                      albumQuery: "",
+                    },
                   })
                 }
               >

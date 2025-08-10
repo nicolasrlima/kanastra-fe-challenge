@@ -1,6 +1,7 @@
 import { useSearch, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { spotifyApiRequest } from "@/lib/spotify";
+import { useState, useEffect } from "react";
 
 const PAGE_SIZE = 20;
 
@@ -36,6 +37,20 @@ export function ArtistPage() {
   const navigate = useNavigate({ from: "/artist" });
   const artistId = search.artistId;
   const albumPage = search.albumPage || 1;
+  const albumQuery = search.albumQuery || "";
+  const [albumSearchInput, setAlbumSearchInput] = useState(albumQuery);
+
+  // Debounce album search input and update search params
+  useEffect(() => {
+    if (albumSearchInput !== albumQuery) {
+      const handler = setTimeout(() => {
+        navigate({
+          search: { ...search, albumQuery: albumSearchInput, albumPage: 1 },
+        });
+      }, 400);
+      return () => clearTimeout(handler);
+    }
+  }, [albumSearchInput, albumQuery, search, navigate]);
 
   // Fetch artist details
   const { data: artist, isLoading: loadingArtist } =
@@ -61,17 +76,29 @@ export function ArtistPage() {
       enabled: !!artistId,
     });
 
-  // Fetch albums (paginated)
+  // Fetch albums (paginated, with search)
   const { data: albums, isLoading: loadingAlbums } =
     useQuery<SpotifyAlbumsResponse | null>({
-      queryKey: ["artist-albums", artistId, albumPage],
+      queryKey: ["artist-albums", artistId, albumPage, albumQuery],
       queryFn: async () => {
         if (!artistId) return null;
-        return spotifyApiRequest<SpotifyAlbumsResponse>(
+        // Spotify's /albums endpoint does not support q param, so filter client-side
+        const allAlbums = await spotifyApiRequest<SpotifyAlbumsResponse>(
           `/artists/${artistId}/albums?limit=${PAGE_SIZE}&offset=${
             (albumPage - 1) * PAGE_SIZE
           }`
         );
+        if (!albumQuery) return allAlbums;
+        const filtered = {
+          ...allAlbums,
+          items: allAlbums.items.filter((album) =>
+            album.name.toLowerCase().includes(albumQuery.toLowerCase())
+          ),
+          total: allAlbums.items.filter((album) =>
+            album.name.toLowerCase().includes(albumQuery.toLowerCase())
+          ).length,
+        };
+        return filtered;
       },
       enabled: !!artistId,
     });
@@ -118,6 +145,18 @@ export function ArtistPage() {
         </ol>
       )}
       <h2 className="text-xl font-semibold mt-8 mb-2">Albums</h2>
+      <form
+        className="mb-4 flex gap-2 justify-center"
+        onSubmit={(e) => e.preventDefault()}
+      >
+        <input
+          type="text"
+          value={albumSearchInput}
+          onChange={(e) => setAlbumSearchInput(e.target.value)}
+          placeholder="Search albums..."
+          className="border rounded px-3 py-2 w-64"
+        />
+      </form>
       {loadingAlbums ? (
         <div>Loading albums...</div>
       ) : (
