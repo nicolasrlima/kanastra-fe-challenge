@@ -39,9 +39,31 @@ interface SpotifyArtistsResponse {
 const PAGE_SIZE = 20;
 
 export function ArtistsTable() {
-  const [page, setPage] = useState(1);
-  const [query, setQuery] = useState("");
-  const [searchInput, setSearchInput] = useState("");
+  const [page, setPage] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return Number(params.get("page")) || 1;
+  });
+  const [query, setQuery] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("q") || "";
+  });
+  const [searchInput, setSearchInput] = useState(query);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (query) {
+      params.set("q", query);
+    } else {
+      params.delete("q");
+    }
+    if (page > 1) {
+      params.set("page", String(page));
+    } else {
+      params.delete("page");
+    }
+    const newUrl = `${window.location.pathname}${params.toString() ? "?" + params.toString() : ""}`;
+    window.history.replaceState({}, "", newUrl);
+  }, [query, page]);
 
   // Debounce search input
   useEffect(() => {
