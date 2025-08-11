@@ -1,5 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
-import { spotifyApiRequest } from "@/lib/spotify";
+import { useGetArtists } from "../../hooks/use-get-artists";
 import { useSearch, useNavigate } from "@tanstack/react-router";
 import {
   Table,
@@ -26,15 +25,6 @@ interface Artist {
   images: { url: string }[];
   popularity: number;
   genres: string[];
-}
-
-interface SpotifyArtistsResponse {
-  artists: {
-    items: Artist[];
-    total: number;
-    limit: number;
-    offset: number;
-  };
 }
 
 const PAGE_SIZE = 20;
@@ -73,20 +63,14 @@ export function ArtistsTable() {
     setSearchParams({ page: newPage });
   };
 
-  const shouldFetch = query?.length > 0;
-  const { data, isLoading, error } = useQuery<SpotifyArtistsResponse, Error>({
-    queryKey: ["artists", page, query],
-    queryFn: async () =>
-      spotifyApiRequest<SpotifyArtistsResponse>(
-        `/search?q=${encodeURIComponent(
-          query
-        )}&type=artist&limit=${PAGE_SIZE}&offset=${(page - 1) * PAGE_SIZE}`
-      ),
-    enabled: shouldFetch,
+  const { data, isLoading, error } = useGetArtists({
+    query,
+    page,
+    pageSize: PAGE_SIZE,
   });
 
   let content;
-  if (!shouldFetch) {
+  if (!query || query.length === 0) {
     content = (
       <div className="text-center text-muted-foreground py-8">
         Type an artist name to search.

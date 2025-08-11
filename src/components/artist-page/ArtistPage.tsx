@@ -1,36 +1,10 @@
 import { useSearch, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { spotifyApiRequest } from "@/lib/spotify";
 import { useState, useEffect } from "react";
+import { useGetArtist } from "@/hooks/use-get-artist";
+import { useGetArtistTopTracks } from "@/hooks/use-get-artist-top-tracks";
+import { useGetArtistAlbums } from "@/hooks/use-get-artist-albums";
 
 const PAGE_SIZE = 20;
-
-// Types for Spotify API responses
-interface SpotifyArtist {
-  id: string;
-  name: string;
-  images: { url: string }[];
-  popularity: number;
-  genres: string[];
-}
-interface SpotifyTrack {
-  id: string;
-  name: string;
-  album: { name: string };
-}
-interface SpotifyTopTracksResponse {
-  tracks: SpotifyTrack[];
-}
-interface SpotifyAlbum {
-  id: string;
-  name: string;
-  images: { url: string }[];
-  release_date: string;
-}
-interface SpotifyAlbumsResponse {
-  items: SpotifyAlbum[];
-  total: number;
-}
 
 export function ArtistPage() {
   const search = useSearch({ from: "/artist" });
@@ -40,7 +14,6 @@ export function ArtistPage() {
   const albumQuery = search.albumQuery || "";
   const [albumSearchInput, setAlbumSearchInput] = useState(albumQuery);
 
-  // Debounce album search input and update search params
   useEffect(() => {
     if (albumSearchInput !== albumQuery) {
       const handler = setTimeout(() => {
@@ -52,56 +25,15 @@ export function ArtistPage() {
     }
   }, [albumSearchInput, albumQuery, search, navigate]);
 
-  // Fetch artist details
-  const { data: artist, isLoading: loadingArtist } =
-    useQuery<SpotifyArtist | null>({
-      queryKey: ["artist", artistId],
-      queryFn: async () => {
-        if (!artistId) return null;
-        return spotifyApiRequest<SpotifyArtist>(`/artists/${artistId}`);
-      },
-      enabled: !!artistId,
-    });
-
-  // Fetch top tracks
+  const { data: artist, isLoading: loadingArtist } = useGetArtist(artistId);
   const { data: topTracks, isLoading: loadingTracks } =
-    useQuery<SpotifyTopTracksResponse | null>({
-      queryKey: ["artist-top-tracks", artistId],
-      queryFn: async () => {
-        if (!artistId) return null;
-        return spotifyApiRequest<SpotifyTopTracksResponse>(
-          `/artists/${artistId}/top-tracks?market=US`
-        );
-      },
-      enabled: !!artistId,
-    });
-
-  // Fetch albums (paginated, with search)
-  const { data: albums, isLoading: loadingAlbums } =
-    useQuery<SpotifyAlbumsResponse | null>({
-      queryKey: ["artist-albums", artistId, albumPage, albumQuery],
-      queryFn: async () => {
-        if (!artistId) return null;
-        // Spotify's /albums endpoint does not support q param, so filter client-side
-        const allAlbums = await spotifyApiRequest<SpotifyAlbumsResponse>(
-          `/artists/${artistId}/albums?limit=${PAGE_SIZE}&offset=${
-            (albumPage - 1) * PAGE_SIZE
-          }`
-        );
-        if (!albumQuery) return allAlbums;
-        const filtered = {
-          ...allAlbums,
-          items: allAlbums.items.filter((album) =>
-            album.name.toLowerCase().includes(albumQuery.toLowerCase())
-          ),
-          total: allAlbums.items.filter((album) =>
-            album.name.toLowerCase().includes(albumQuery.toLowerCase())
-          ).length,
-        };
-        return filtered;
-      },
-      enabled: !!artistId,
-    });
+    useGetArtistTopTracks(artistId);
+  const { data: albums, isLoading: loadingAlbums } = useGetArtistAlbums({
+    artistId,
+    albumPage,
+    albumQuery,
+    pageSize: PAGE_SIZE,
+  });
 
   if (!artistId)
     return <div className="p-8 text-center">No artist selected.</div>;
