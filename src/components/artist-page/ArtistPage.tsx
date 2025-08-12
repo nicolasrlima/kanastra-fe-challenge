@@ -135,7 +135,6 @@ export function ArtistPage() {
             >
               Previous
             </button>
-            {/* Numbered pagination */}
             {Array.from(
               {
                 length: Math.max(
