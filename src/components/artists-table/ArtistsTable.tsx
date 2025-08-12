@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/pagination";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Input } from "../ui/input";
 
 interface Artist {
   id: string;
@@ -186,7 +187,7 @@ export function ArtistsTable() {
         className="mb-4 flex gap-2 justify-center"
         onSubmit={(e) => e.preventDefault()}
       >
-        <input
+        <Input
           type="text"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
