@@ -4,6 +4,15 @@ import { useGetArtist } from "@/hooks/use-get-artist";
 import { useGetArtistTopTracks } from "@/hooks/use-get-artist-top-tracks";
 import { useGetArtistAlbums } from "@/hooks/use-get-artist-albums";
 import { useTranslation } from "react-i18next";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationPrevious,
+  PaginationNext,
+  PaginationLink,
+} from "@/components/ui/pagination";
+import { Input } from "@/components/ui/input";
 
 const PAGE_SIZE = 20;
 
@@ -39,6 +48,7 @@ export function ArtistPage() {
 
   if (!artistId)
     return <div className="p-8 text-center">{t("no_artist_selected")}</div>;
+
   if (loadingArtist)
     return (
       <div className="flex flex-col items-center justify-center p-12 min-h-[300px]">
@@ -48,6 +58,7 @@ export function ArtistPage() {
         </div>
       </div>
     );
+
   if (!artist)
     return <div className="p-8 text-center">{t("artist_not_found")}</div>;
 
@@ -94,12 +105,12 @@ export function ArtistPage() {
         className="mb-4 flex gap-2 justify-center"
         onSubmit={(e) => e.preventDefault()}
       >
-        <input
+        <Input
           type="text"
           value={albumSearchInput}
           onChange={(e) => setAlbumSearchInput(e.target.value)}
           placeholder={t("search_placeholder")}
-          className="border rounded px-3 py-2 w-64"
+          className="w-64"
         />
       </form>
       {loadingAlbums ? (
@@ -128,50 +139,62 @@ export function ArtistPage() {
               </li>
             ))}
           </ul>
-          <div className="flex gap-2 justify-center items-center">
-            <button
-              className="px-3 py-1 rounded border disabled:opacity-50"
-              disabled={albumPage === 1}
-              onClick={() =>
-                navigate({ search: { ...search, albumPage: albumPage - 1 } })
-              }
-            >
-              {t("previous")}
-            </button>
-            {Array.from(
-              {
-                length: Math.max(
-                  1,
-                  Math.ceil((albums?.total ?? 0) / PAGE_SIZE)
-                ),
-              },
-              (_, i) => (
-                <button
-                  key={i + 1}
-                  className={`px-3 py-1 rounded border ${
-                    albumPage === i + 1
-                      ? "bg-accent text-accent-foreground font-bold"
-                      : ""
-                  }`}
+          <Pagination className="mt-4">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
                   onClick={() =>
-                    navigate({ search: { ...search, albumPage: i + 1 } })
+                    navigate({
+                      search: {
+                        ...search,
+                        albumPage: Math.max(1, albumPage - 1),
+                      },
+                    })
                   }
-                  disabled={albumPage === i + 1}
+                  aria-disabled={albumPage === 1}
+                  tabIndex={albumPage === 1 ? -1 : 0}
                 >
-                  {i + 1}
-                </button>
-              )
-            )}
-            <button
-              className="px-3 py-1 rounded border disabled:opacity-50"
-              disabled={albums?.items?.length !== PAGE_SIZE}
-              onClick={() =>
-                navigate({ search: { ...search, albumPage: albumPage + 1 } })
-              }
-            >
-              {t("next")}
-            </button>
-          </div>
+                  {t("previous")}
+                </PaginationPrevious>
+              </PaginationItem>
+              {Array.from(
+                {
+                  length: Math.max(
+                    1,
+                    Math.ceil((albums?.total ?? 0) / PAGE_SIZE)
+                  ),
+                },
+                (_, i) => (
+                  <PaginationItem key={i + 1}>
+                    <PaginationLink
+                      isActive={albumPage === i + 1}
+                      onClick={() =>
+                        navigate({
+                          search: { ...search, albumPage: i + 1 },
+                        })
+                      }
+                      href="#"
+                    >
+                      {i + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                )
+              )}
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() =>
+                    navigate({
+                      search: { ...search, albumPage: albumPage + 1 },
+                    })
+                  }
+                  aria-disabled={albums?.items?.length !== PAGE_SIZE}
+                  tabIndex={albums?.items?.length !== PAGE_SIZE ? -1 : 0}
+                >
+                  {t("next")}
+                </PaginationNext>
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
       )}
     </div>

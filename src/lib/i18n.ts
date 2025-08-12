@@ -1,7 +1,6 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
-// Type-safe translation keys
 export const resources = {
   en: {
     translation: {
@@ -53,7 +52,6 @@ export type AppLanguages = keyof typeof resources;
 
 export type TranslationKeys = keyof typeof resources.en.translation;
 
-// i18n initialization
 void i18n.use(initReactI18next).init({
   resources,
   lng: "en",
