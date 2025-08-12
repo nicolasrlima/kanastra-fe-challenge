@@ -18,6 +18,7 @@ import {
   PaginationNext,
 } from "@/components/ui/pagination";
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface Artist {
   id: string;
@@ -30,6 +31,7 @@ interface Artist {
 const PAGE_SIZE = 20;
 
 export function ArtistsTable() {
+  const { t } = useTranslation();
   const search = useSearch({ from: "/" });
   const navigate = useNavigate({ from: "/" });
   const page = search.page;
@@ -73,7 +75,7 @@ export function ArtistsTable() {
   if (!query || query.length === 0) {
     content = (
       <div className="text-center text-muted-foreground py-8">
-        Type an artist name to search.
+        {t("type_to_search")}
       </div>
     );
   } else if (isLoading) {
@@ -81,16 +83,16 @@ export function ArtistsTable() {
       <div className="flex flex-col items-center justify-center py-16 min-h-[200px]">
         <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin mb-4" />
         <div className="text-lg text-muted-foreground font-medium">
-          Loading artists...
+          {t("loading_artists")}
         </div>
       </div>
     );
   } else if (error) {
-    content = <div>Error loading artists.</div>;
+    content = <div>{t("error_loading_artists")}</div>;
   } else if ((data?.artists?.items?.length ?? 0) === 0) {
     content = (
       <div className="text-center text-muted-foreground py-8">
-        No artists found.
+        {t("no_artists_found")}
       </div>
     );
   } else {
@@ -100,13 +102,13 @@ export function ArtistsTable() {
     content = (
       <>
         <Table>
-          <TableCaption>Artists</TableCaption>
+          <TableCaption>{t("albums")}</TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead>Image</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Popularity</TableHead>
-              <TableHead>Genres</TableHead>
+              <TableHead>{t("genres")}</TableHead>
+              <TableHead>{t("popularity")}</TableHead>
+              <TableHead>{t("genres")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -148,7 +150,9 @@ export function ArtistsTable() {
                 onClick={() => handlePageChange(Math.max(1, page - 1))}
                 aria-disabled={page === 1}
                 tabIndex={page === 1 ? -1 : 0}
-              />
+              >
+                {t("previous")}
+              </PaginationPrevious>
             </PaginationItem>
             {Array.from({ length: pageCount }, (_, i) => (
               <PaginationItem key={i + 1}>
@@ -166,7 +170,9 @@ export function ArtistsTable() {
                 onClick={() => handlePageChange(Math.min(pageCount, page + 1))}
                 aria-disabled={page === pageCount}
                 tabIndex={page === pageCount ? -1 : 0}
-              />
+              >
+                {t("next")}
+              </PaginationNext>
             </PaginationItem>
           </PaginationContent>
         </Pagination>
@@ -184,7 +190,7 @@ export function ArtistsTable() {
           type="text"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          placeholder="Search for an artist..."
+          placeholder={t("search_placeholder")}
           className="border rounded px-3 py-2 w-64"
         />
       </form>

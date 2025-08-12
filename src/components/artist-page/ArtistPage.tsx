@@ -3,10 +3,12 @@ import { useState, useEffect } from "react";
 import { useGetArtist } from "@/hooks/use-get-artist";
 import { useGetArtistTopTracks } from "@/hooks/use-get-artist-top-tracks";
 import { useGetArtistAlbums } from "@/hooks/use-get-artist-albums";
+import { useTranslation } from "react-i18next";
 
 const PAGE_SIZE = 20;
 
 export function ArtistPage() {
+  const { t } = useTranslation();
   const search = useSearch({ from: "/artist" });
   const navigate = useNavigate({ from: "/artist" });
   const artistId = search.artistId;
@@ -36,17 +38,18 @@ export function ArtistPage() {
   });
 
   if (!artistId)
-    return <div className="p-8 text-center">No artist selected.</div>;
+    return <div className="p-8 text-center">{t("no_artist_selected")}</div>;
   if (loadingArtist)
     return (
       <div className="flex flex-col items-center justify-center p-12 min-h-[300px]">
         <div className="w-16 h-16 border-4 border-accent border-t-transparent rounded-full animate-spin mb-4" />
         <div className="text-lg text-muted-foreground font-medium">
-          Loading artist...
+          {t("loading_artist")}
         </div>
       </div>
     );
-  if (!artist) return <div className="p-8 text-center">Artist not found.</div>;
+  if (!artist)
+    return <div className="p-8 text-center">{t("artist_not_found")}</div>;
 
   return (
     <div className="max-w-3xl mx-auto p-6">
@@ -61,18 +64,18 @@ export function ArtistPage() {
         <div>
           <h1 className="text-3xl font-bold mb-2">{artist.name}</h1>
           <div className="text-muted-foreground mb-1">
-            Popularity: {artist.popularity}
+            {t("popularity")}: {artist.popularity}
           </div>
           <div className="text-muted-foreground">
-            Genres: {artist.genres?.join(", ")}
+            {t("genres")}: {artist.genres?.join(", ")}
           </div>
         </div>
       </div>
-      <h2 className="text-xl font-semibold mt-8 mb-2">Top Tracks</h2>
+      <h2 className="text-xl font-semibold mt-8 mb-2">{t("top_tracks")}</h2>
       {loadingTracks ? (
         <div className="flex flex-col items-center justify-center py-8">
           <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin mb-2" />
-          <div className="text-muted-foreground">Loading top tracks...</div>
+          <div className="text-muted-foreground">{t("loading_top_tracks")}</div>
         </div>
       ) : (
         <ol className="list-decimal ml-6">
@@ -86,7 +89,7 @@ export function ArtistPage() {
           ))}
         </ol>
       )}
-      <h2 className="text-xl font-semibold mt-8 mb-2">Albums</h2>
+      <h2 className="text-xl font-semibold mt-8 mb-2">{t("albums")}</h2>
       <form
         className="mb-4 flex gap-2 justify-center"
         onSubmit={(e) => e.preventDefault()}
@@ -95,14 +98,14 @@ export function ArtistPage() {
           type="text"
           value={albumSearchInput}
           onChange={(e) => setAlbumSearchInput(e.target.value)}
-          placeholder="Search albums..."
+          placeholder={t("search_placeholder")}
           className="border rounded px-3 py-2 w-64"
         />
       </form>
       {loadingAlbums ? (
         <div className="flex flex-col items-center justify-center py-8">
           <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin mb-2" />
-          <div className="text-muted-foreground">Loading albums...</div>
+          <div className="text-muted-foreground">{t("loading_albums")}</div>
         </div>
       ) : (
         <div>
@@ -133,7 +136,7 @@ export function ArtistPage() {
                 navigate({ search: { ...search, albumPage: albumPage - 1 } })
               }
             >
-              Previous
+              {t("previous")}
             </button>
             {Array.from(
               {
@@ -166,7 +169,7 @@ export function ArtistPage() {
                 navigate({ search: { ...search, albumPage: albumPage + 1 } })
               }
             >
-              Next
+              {t("next")}
             </button>
           </div>
         </div>
