@@ -1,69 +1,91 @@
-# React + TypeScript + Vite
+# Kanasta Frontend Challenge – Spotify Artist Explorer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Deploy
 
-Currently, two official plugins are available:
+- O projeto está hospedado pelo AWS Amplify. Acesse [https://main.d1zyarm2xgo6et.amplifyapp.com/) para ver a aplicação em produção.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Como rodar o projeto
 
-## Expanding the ESLint configuration
+1. **Pré-requisitos:**
+   - Node.js >= 24
+   - pnpm (ou npm/yarn)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+2. **Instale as dependências:**
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+   ```sh
+   pnpm install
+   # ou
+   npm install
+   # ou
+   yarn
+   ```
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+3. **Inicie o servidor de desenvolvimento:**
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+   ```sh
+   pnpm dev
+   # ou
+   npm run dev
+   # ou
+   yarn dev
+   ```
+
+4. **Acesse:**
+   Abra [http://localhost:5173](http://localhost:5173) no navegador.
+
+5. **Testes:**
+   ```sh
+   pnpm test
+   # ou
+   npm test
+   # ou
+   yarn test
+   ```
+
+## 🛠️ Stack e Ferramentas
+
+- **React + TypeScript:** Base do frontend, com tipagem forte e componentes funcionais.
+- **shadcn/ui:** Biblioteca de componentes UI acessíveis e modernos, utilizada para tabelas, inputs, selects e paginação.
+- **TanStack Router:** Roteamento baseado em arquivos, com sincronização de parâmetros de busca e navegação fluida.
+- **React Query:** Gerenciamento de cache e requisições assíncronas, garantindo performance e UX responsiva.
+- **i18n (react-i18next):** Internacionalização com suporte a inglês e português, incluindo troca dinâmica de idioma.
+- **Vitest + React Testing Library:** Testes unitários completos, com mocks para hooks de dados e cobertura de 100% dos principais fluxos.
+- **Spotify Web API:** Integração para busca de artistas, álbuns e faixas.
+
+## ✨ Funcionalidades
+
+- Busca de artistas do Spotify com paginação e pesquisa dinâmica.
+- Visualização de detalhes do artista, álbuns e faixas mais populares.
+- UI responsiva, moderna e consistente.
+- Internacionalização (EN/PT-BR) com seletor de idioma.
+- Código modular, tipado e de fácil manutenção.
+
+## 📁 Estrutura de Pastas
+
+```
+src/
+  components/
+    artist-page/
+    artists-table/
+    ui/
+  hooks/
+  lib/
+  routes/
+  assets/
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- **components/**: Componentes.
+- **hooks/**: Hooks customizados para integração com a API do Spotify.
+- **lib/**: Utilitários, configuração de i18n e integração com a API.
+- **routes/**: Rotas da aplicação (TanStack Router).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🧪 Testes
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Escrevi apenas um teste unitário, infelizmente por questão de prazo não pude expandir e nem utilizar as melhores práticas.
+O caminho que sigo para testes é de criar testes unitários para componentes isolados, testes de integração para fluxos principais e2e para simular a experiência do usuário. Minha referência de boas práticas tem sido o material do Kent C. Dodds (https://kentcdodds.com/blog/the-testing-trophy-and-testing-classifications).
+
+## 🌎 Internacionalização
+
+- Suporte a inglês e português.
+- Seletor de idioma no cabeçalho.
+- Todos os textos da UI extraídos para arquivos de tradução.
